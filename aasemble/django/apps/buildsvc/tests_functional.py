@@ -52,11 +52,12 @@ class RepositoryFunctionalTests(StaticLiveServerTestCase):
     def test_source_botton (self):
         session_cookie = create_session_cookie(username='myuser', password='123456')
         group = create_default_group(name='mygrp')
-        assert group.name == 'mygrp' , "Group is not created properly"
+#        assert group.name == 'mygrp' , "Group is not created properly"
+        self.assertEqual(group.name, 'mygrp')
         repo = create_default_repo(name='myrepo', username='myuser')
-        assert repo.name == 'myrepo' , "Repo is not created properly"
+        self.assertEqual(repo.name, 'myrepo')
         series = create_series(name='myseries', reponame='myrepo')
-        assert series.name == 'myseries' , "Series is not created properly"
+        self.assertEqual(series.name, 'myseries')
         self.selenium.get(self.live_server_url)
         self.selenium.add_cookie(session_cookie)
         self.selenium.get('%s%s' % (self.live_server_url, '/buildsvc/sources/'))
