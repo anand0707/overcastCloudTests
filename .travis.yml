@@ -1,0 +1,22 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "pypy"
+env:
+  - DJANGO_VERSION=1.8
+  - DJANGO_VERSION=1.9b1
+install:
+  - pip install -U pip
+  - pip install -U Django==$DJANGO_VERSION
+  - pip install -r requirements.txt
+  - pip install -r test-requirements.txt
+script:
+  - "xvfb-run python -m coverage run --source=aasemble manage.py test -v3"
+  - "flake8 --ignore=E501 --application-import-names=aasemble aasemble"
+  - "python -m coverage report -m"
+deploy:
+  provider: script
+  script: scripts/deploy.sh
+  on:
+    branch: master
