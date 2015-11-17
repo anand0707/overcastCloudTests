@@ -6,7 +6,7 @@ from django.test.utils import skipIf
 
 from selenium.webdriver.firefox.webdriver import WebDriver
 
-from aasemble.django.tests import create_session_cookie
+from aasemble.django.tests import *
 
 
 @skipIf(os.environ.get('SKIP_SELENIUM_TESTS', '') == '1',
@@ -47,3 +47,66 @@ class RepositoryFunctionalTests(StaticLiveServerTestCase):
         page_header = self.selenium.find_element_by_class_name('page-header')
         text_found = re.search(r'Sources', page_header.text)
         self.assertNotEqual(text_found, None)
+		
+def test_source_botton (self):
+        session_cookie = create_session_cookie(username='myuser', password='123456')
+        group = create_default_group(name='mygrp')
+        assert group.name == 'mygrp' , "Group is not created properly"
+        repo = create_default_repo(name='myrepo', username='myuser')
+        assert repo.name == 'myrepo' , "Repo is not created properly"
+        series = create_series(name='myseries', reponame='myrepo')
+        assert series.name == 'myseries' , "Series is not created properly"
+        self.selenium.get(self.live_server_url)
+        self.selenium.add_cookie(session_cookie)
+        self.selenium.get('%s%s' % (self.live_server_url, '/buildsvc/sources/'))
+        self.sources_button.click()
+        self.create_new_package_source(git_url='https://github.com/anand0707/myrepo.git', branch='master', series='myrepo/myseries')
+        self.delete_package_source()
+        #We will follow opposite order as that of creation
+        delete_series(name='myseries')
+        delete_repo(name='myrepo')
+        delete_group(name='mygrp')
+        delete_user(username='myuser')
+
+
+    def create_new_package_source(self, git_url, branch, series):
+        self.new_submit_button.click()
+        self.git_url.send_keys(git_url)
+        self.branch.send_keys(branch)
+        self.select_from_dropdown_menu(series)
+        self.new_submit_button.submit()
+
+    def select_from_dropdown_menu(self, series):
+        mySelect = Select(self.selenium.find_element_by_id("id_series"))
+        mySelect.select_by_visible_text(series)
+
+    def delete_package_source(self):
+        self.sources_button.click()
+        self.package_edit_button.click()
+        self.delete_button.click()
+
+    @property
+    def sources_button(self):
+        return self.selenium.find_element(by.By.LINK_TEXT, 'Sources')
+
+    @property
+    def new_submit_button(self):
+        return self.selenium.find_element(by.By.CSS_SELECTOR, '.btn.btn-primary')
+
+    @property
+    def git_url(self):
+        return self.selenium.find_element(by.By.ID, 'id_git_url')
+
+    @property
+    def branch(self):
+        return self.selenium.find_element(by.By.ID, 'id_branch')
+    
+    @property
+    def package_edit_button(self):
+        #It will find first element
+        return self.selenium.find_element(by.By.CSS_SELECTOR, '.glyphicon.glyphicon-pencil')
+
+    @property
+    def delete_button(self):
+        return self.selenium.find_element(by.By.CSS_SELECTOR, '.btn.btn-danger')
+
