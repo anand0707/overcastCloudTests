@@ -3,9 +3,10 @@ import re
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test.utils import skipIf
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common import by
 from selenium.webdriver.firefox.webdriver import WebDriver
-
+from selenium.webdriver.support.ui import Select
 from aasemble.django.tests import *
 
 
@@ -48,7 +49,7 @@ class RepositoryFunctionalTests(StaticLiveServerTestCase):
         text_found = re.search(r'Sources', page_header.text)
         self.assertNotEqual(text_found, None)
 		
-def test_source_botton (self):
+    def test_source_botton (self):
         session_cookie = create_session_cookie(username='myuser', password='123456')
         group = create_default_group(name='mygrp')
         assert group.name == 'mygrp' , "Group is not created properly"
